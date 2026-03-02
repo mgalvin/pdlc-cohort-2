@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  description: Minimal scaffold API
+  version: 1.0.0
+  title: Backend API
+  contact:
+    email: azdevteam@microsoft.com
+
+paths:
+  /:
+    get:
+      operationId: GetRoot
+      summary: Root endpoint
+      responses:
+        200:
+          description: OK
+  /health:
+    get:
+      operationId: GetHealth
+      summary: Health check
+      responses:
+        200:
+          description: OK
