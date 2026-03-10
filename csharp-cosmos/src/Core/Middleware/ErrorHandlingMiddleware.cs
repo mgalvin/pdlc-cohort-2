@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace Todo.Core.Middleware;
@@ -44,13 +45,16 @@ public class ErrorHandlingMiddleware
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)statusCode;
 
-        var errorDetail = new { code, message, field = (string?)null };
-        var payload = new { errors = new[] { errorDetail } };
-
-        if (_env.IsDevelopment())
+        object payload;
+        if (string.Equals(_env.EnvironmentName, Environments.Development, StringComparison.OrdinalIgnoreCase))
         {
             var devError = new { code, message, field = (string?)null, detail = ex.ToString() };
             payload = new { errors = new[] { devError } };
+        }
+        else
+        {
+            var errorDetail = new { code, message, field = (string?)null };
+            payload = new { errors = new[] { errorDetail } };
         }
 
         await context.Response.WriteAsync(JsonSerializer.Serialize(payload, JsonOptions));

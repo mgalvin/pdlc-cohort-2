@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Todo.Api", "Todo.Api.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Todo.Core", "..\Core\Todo.Core.csproj", "{B51439D0-DEF8-4CF7-9E57-CA227AA78057}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Todo.Api.Tests", "Todo.Api.Tests.csproj", "{C51439D0-DEF8-4CF7-9E57-CA227AA78058}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Todo.Api.Tests", "Tests\Todo.Api.Tests.csproj", "{C51439D0-DEF8-4CF7-9E57-CA227AA78058}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

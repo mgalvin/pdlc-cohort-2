@@ -2,6 +2,8 @@ using Azure.Identity;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Todo.Core.Infrastructure.Health;
 
 namespace Todo.Core.Infrastructure;
 
@@ -18,7 +20,31 @@ public static class StartupExtensions
     public static IServiceCollection AddCoreInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddCosmosDb(configuration);
+        services.AddApplicationHealthChecks(configuration);
         return services;
+    }
+
+    /// <summary>
+    /// Registers health checks with tag-based categorization (live, ready, detailed).
+    /// Self-check for liveness/readiness/detailed; Cosmos DB check when endpoint is configured.
+    /// </summary>
+    public static IHealthChecksBuilder AddApplicationHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    {
+        var enabled = configuration.GetValue("HealthChecks:Enabled", true);
+        if (!enabled)
+            return services.AddHealthChecks();
+
+        var builder = services.AddHealthChecks()
+            .AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Application is running"), tags: new[] { "live", "ready", "detailed" });
+
+        var timeout = TimeSpan.FromSeconds(configuration.GetValue("HealthChecks:TimeoutSeconds", 5));
+        var endpoint = configuration["AZURE_COSMOS_ENDPOINT"];
+        if (!string.IsNullOrEmpty(endpoint))
+        {
+            builder.AddCheck<CosmosDbHealthCheck>("cosmosdb", failureStatus: HealthStatus.Unhealthy, tags: new[] { "ready", "detailed" }, timeout: timeout);
+        }
+
+        return builder;
     }
 
     /// <summary>
